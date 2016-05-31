@@ -1,15 +1,15 @@
 // __tests__/Store-test.js
 
-jest.dontMock('../McFly');
+jest.dontMock('../Flaxs');
 jest.dontMock('../Store');
 jest.dontMock('../ActionsFactory');
 jest.dontMock('../Action');
 jest.dontMock('../Dispatcher');
 
 
-describe('McFly', () => {
+describe('Flaxs', () => {
 
-  var McFly = require('../McFly');
+  var flaxs = require('../Flaxs').flaxs;
   var Store = require('../Store').default;
   var ActionsFactory = require('../ActionsFactory').default;
   var TestConstants = {
@@ -17,12 +17,10 @@ describe('McFly', () => {
     TEST_REMOVE: 'TEST_REMOVE'
   };
 
-  var mcFly, mockStore, mockActionsFactory;
+  var flaxs, mockStore, mockActionsFactory;
   const testItems = [];
 
-  mcFly = new McFly();
-
-  mockStore = mcFly.createStore({
+  mockStore = flaxs.createStore({
     getItems: () => testItems,
   }, function(payload) {
     switch(payload.actionType) {
@@ -38,7 +36,7 @@ describe('McFly', () => {
     return true;
   });
 
-  mockActionsFactory = mcFly.createActions({
+  mockActionsFactory = flaxs.createActions({
     add: function(item) {
       return {
         actionType: TestConstants.TEST_ADD,
@@ -53,7 +51,7 @@ describe('McFly', () => {
     }
   });
 
-  mcFly.createReducer('reducer', (state, { actionType, item }) => {
+  flaxs.createReducer('reducer', (state, { actionType, item }) => {
     switch(actionType) {
       case TestConstants.TEST_ADD: {
         const adds = state.adds + (typeof item === 'number' ? item : 1);
@@ -73,7 +71,7 @@ describe('McFly', () => {
 
   it('should instantiate a new dispatcher and attach it to the new instance', () => {
 
-    expect(mcFly.dispatcher).toBeDefined();
+    expect(flaxs.dispatcher).toBeDefined();
 
   });
 
@@ -85,7 +83,7 @@ describe('McFly', () => {
 
   it('should store created Stores in a stores property', () => {
 
-    expect(mcFly.stores.indexOf(mockStore) !== -1).toEqual(true);
+    expect(flaxs.stores.indexOf(mockStore) !== -1).toEqual(true);
 
   });
 
@@ -103,7 +101,7 @@ describe('McFly', () => {
 
   it('should store created ActionsFactory methods in an actions property', () => {
 
-    expect("add" in mcFly.actions).toEqual(true);
+    expect("add" in flaxs.actions).toEqual(true);
 
   });
 
@@ -120,8 +118,8 @@ describe('McFly', () => {
   });
 
   it('should createReducers for the MasterStore', () => {
-    expect(Object.keys(mcFly.reducers).length).toEqual(1);
-    expect(mcFly.store.state).toEqual({
+    expect(Object.keys(flaxs.reducers).length).toEqual(1);
+    expect(flaxs.store.state).toEqual({
       reducer: {
         adds: 1,
         removes: 1,
@@ -130,9 +128,9 @@ describe('McFly', () => {
   });
 
   it('should register the reducer with a token ID in MasterStore', () => {
-    expect(mcFly.store.getDispatchTokens('reducer').length).toBe(1);
-    expect(mcFly.store.getDispatchTokens('reducer')[0]).toMatch(/ID_\d+/);
-    expect(mcFly.store.getDispatchTokens(['reducer']).length).toBe(1);
+    expect(flaxs.store.getDispatchTokens('reducer').length).toBe(1);
+    expect(flaxs.store.getDispatchTokens('reducer')[0]).toMatch(/ID_\d+/);
+    expect(flaxs.store.getDispatchTokens(['reducer']).length).toBe(1);
   });
 
   pit('should digest the correct payload in the reducer when it is dispatched', async () => {
@@ -140,10 +138,10 @@ describe('McFly', () => {
     const testItem = 5;
 
     await mockActionsFactory.add(testItem);
-    expect(mcFly.store.state.reducer.adds).toEqual(6);
+    expect(flaxs.store.state.reducer.adds).toEqual(6);
 
     await mockActionsFactory.remove(testItem);
-    expect(mcFly.store.state.reducer.removes).toEqual(6);
+    expect(flaxs.store.state.reducer.removes).toEqual(6);
 
   });
 });

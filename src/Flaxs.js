@@ -8,7 +8,7 @@ import { assign } from 'lodash';
 /**
  * Main McFly Class
  */
-class McFly {
+class Flaxs {
 
   /**
    * Instatiates McFly along with actions object, stores array and sets
@@ -75,4 +75,4 @@ class McFly {
   }
 }
 
-module.exports = McFly;
+export const flaxs = new Flaxs();
