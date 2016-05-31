@@ -2,7 +2,6 @@
 
 jest.dontMock('../ActionsFactory');
 jest.dontMock('../Action');
-jest.dontMock('object-assign');
 
 describe('ActionsFactory', () => {
 

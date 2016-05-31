@@ -1,7 +1,7 @@
 'use strict';
 
 import Action from './Action';
-import assign from 'object-assign';
+import { forEach } from 'lodash';
 
 /**
  * ActionsFactory class
@@ -16,13 +16,9 @@ export default class ActionsFactory {
    * @constructor
    */
   constructor(actions) {
-    const _actions = {};
-    for (let a in actions) {
-      if(actions.hasOwnProperty(a)){
-        const action = new Action(actions[a]);
-        _actions[a] = action.dispatch.bind(action);
-      }
-    }
-    assign(this, _actions);
+    forEach(actions, (actionCallback, actionName) => {
+      const action = new Action(actionCallback);
+      this[actionName] = action.dispatch.bind(action);
+    });
   }
 }

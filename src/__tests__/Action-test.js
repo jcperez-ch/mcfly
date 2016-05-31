@@ -1,7 +1,6 @@
 // __tests__/Action-test.js
 
 jest.dontMock('../Action');
-jest.dontMock('invariant');
 
 describe('Action', function() {
 

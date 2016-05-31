@@ -42,15 +42,33 @@ describe('McFly', () => {
     add: function(item) {
       return {
         actionType: TestConstants.TEST_ADD,
-        item: item
+        item,
       }
     },
     remove: function(item) {
       return {
         actionType: TestConstants.TEST_REMOVE,
-        item: item
+        item,
       }
     }
+  });
+
+  mcFly.createReducer('reducer', (state, { actionType, item }) => {
+    switch(actionType) {
+      case TestConstants.TEST_ADD: {
+        const adds = state.adds + (typeof item === 'number' ? item : 1);
+        return { ...state, adds };
+      }
+      case TestConstants.TEST_REMOVE: {
+        const removes = state.removes + (typeof item === 'number' ? item : 1);
+        return { ...state, removes };
+      }
+      default:
+    }
+    return state;
+  }, {
+    adds: 0,
+    removes: 0,
   });
 
   it('should instantiate a new dispatcher and attach it to the new instance', () => {
@@ -101,4 +119,31 @@ describe('McFly', () => {
 
   });
 
+  it('should createReducers for the MasterStore', () => {
+    expect(Object.keys(mcFly.reducers).length).toEqual(1);
+    expect(mcFly.store.state).toEqual({
+      reducer: {
+        adds: 1,
+        removes: 1,
+      },
+    });
+  });
+
+  it('should register the reducer with a token ID in MasterStore', () => {
+    expect(mcFly.store.getDispatchTokens('reducer').length).toBe(1);
+    expect(mcFly.store.getDispatchTokens('reducer')[0]).toMatch(/ID_\d+/);
+    expect(mcFly.store.getDispatchTokens(['reducer']).length).toBe(1);
+  });
+
+  pit('should digest the correct payload in the reducer when it is dispatched', async () => {
+
+    const testItem = 5;
+
+    await mockActionsFactory.add(testItem);
+    expect(mcFly.store.state.reducer.adds).toEqual(6);
+
+    await mockActionsFactory.remove(testItem);
+    expect(mcFly.store.state.reducer.removes).toEqual(6);
+
+  });
 });

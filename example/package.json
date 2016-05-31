@@ -31,9 +31,6 @@
   },
   "author": "Ken Wheeler",
   "browserify": {
-    "transform": [
-      "reactify",
-      "babelify"
-    ]
+    "transform": [ "babelify" ]
   }
 }

@@ -28,9 +28,9 @@
     "rootDir": "src",
     "scriptPreprocessor": "<rootDir>/../node_modules/babel-jest/src/index.js",
     "unmockedModulePathPatterns": [
-      "node_modules(/|\\\\)object-assign",
       "node_modules(/|\\\\)flux",
-      "node_modules(/|\\\\)invariant"
+      "node_modules(/|\\\\)invariant",
+      "node_modules(/|\\\\)lodash"
     ],
     "moduleFileExtensions": [
       "js",
@@ -47,7 +47,7 @@
   "dependencies": {
     "flux": "^2.1.1",
     "invariant": "^2.2.1",
-    "object-assign": "^4.1.0"
+    "lodash": "^4.13.1"
   },
   "devDependencies": {
     "babel-jest": "^12.1.0",
