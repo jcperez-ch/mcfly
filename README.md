@@ -1,113 +1,10 @@
-# McFly
-Flux Architecture Made Easy
+# Flaxs
 
-*What is McFly?*
-
-When writing ReactJS apps, it is enormously helpful to use Facebook's Flux architecture. It truly complements ReactJS' unidirectional data flow model. Facebook's Flux library provides a Dispatcher, and some examples of how to write Actions and Stores. However, there are no helpers for Action & Store creation, and Stores require 3rd party eventing.
-
-McFly is a library that provides all 3 components of Flux architecture, using Facebook's Dispatcher, and providing factories for Actions & Stores.
-
-## Demo
-
-Check out this JSFiddle Demo to see how McFly can work for you:
-
-[http://jsfiddle.net/6rauuetb/](http://jsfiddle.net/6rauuetb/)
-
-## Download
-
-McFly can be downloaded from:
-
-[http://kenwheeler.github.io/mcfly/McFly.js](http://kenwheeler.github.io/mcfly/McFly.js)
-
-## Dispatcher
-
-McFly uses Facebook Flux's dispatcher. When McFly is instantiated, a single dispatcher instance is created and can be accessed like shown below:
-
-```javascript
-var mcFly = new McFly();
-
-return mcFly.dispatcher;
 ```
-In fact, all created Actions & Stores are also stored on the McFly object as `actions` and `stores` respectively.
-
-## Stores
-
-McFly has a **createStore** helper method that creates an instance of a Store. Store instances have been merged with EventEmitter and come with **emitChange**, **addChangeListener** and **removeChangeListener** methods built in.
-
-When a store is created, its methods parameter specifies what public methods should be added to the Store object. Every store is automatically registered with the Dispatcher and the `dispatcherID` is stored on the Store object itself, for use in `waitFor` methods.
-
-Creating a store with McFly looks like this:
-
-```javascript
-var _todos = [];
-
-function addTodo(text) {
-  _todos.push(text);
-}
-
-var TodoStore = mcFly.createStore({
-
-getTodos: function() {
-  return _todos;
-}
-
-}, function(payload){
-  var needsUpdate = false;
-
-  switch(payload.actionType) {
-  case 'ADD_TODO':
-    addTodo(payload.text);
-    needsUpdate = true;
-    break;
-  }
-
-  if (needsUpdate) {
-    TodoStore.emitChange();
-  }
-
-});
+const Flaxs = Flux + Redux.principles().
 ```
-
-Use `Dispatcher.waitFor` if you need to ensure handlers from other stores run first.
-
-```javascript
-var mcFly = new McFly();
-var Dispatcher = mcFly.dispatcher;
-var OtherStore = require('../stores/OtherStore');
-var _todos = [];
-
-function addTodo(text, someValue) {
-  _todos.push({ text: text, someValue: someValue });
-}
-
- ...
-
-    case 'ADD_TODO':
-      Dispatcher.waitFor([OtherStore.dispatcherID]);
-      var someValue = OtherStore.getSomeValue();
-      addTodo(payload.text, someValue);
-      break;
-
- ...
-```
-
-Stores are also created a with a ReactJS component mixin that adds and removes store listeners that call a **storeDidChange** component method.
-
-Adding Store eventing to your component is as easy as:
-
-```javascript
-var TodoStore = require('../stores/TodoStore');
-
-var TodoApp = React.createClass({
-
-  mixins: [TodoStore.mixin],
-
-})
-```
-
-## Reducers
-
-Motivated by Redux, the most popular flux implementation, reducers are reduced dispatched callbacks that modify a single state of the application.  Similar to Stores in mcFly but suppressing the getters object and incorporating by default the global state of the master store.
+Flaxs incorporates a flux architecture reusing Facebook's Flux `Dispatcher` principle and the Event publish/subscribe pattern.  
+Motivated by Redux and Flux, reducers are reduced-pure callbacks that modify a single state of the application.  Similar to Stores in McFly but suppressing the getters object and incorporating by default the global state of the master store.
 
 Reducers in this project follow the 3 basic principles of Redux ([Read about Redux](http://redux.js.org/docs/introduction/ThreePrinciples.html)), which are:
 
@@ -115,13 +12,120 @@ Reducers in this project follow the 3 basic principles of Redux ([Read about Red
 - **Immutable state**. That means that the store contains a state which is a one-level object with immutable attribute values. The only way to mutate the state is to emit an action, an object describing what happened.
 - **State changes are made via pure functions**. Reducers are just pure functions that take the previous state and an action, and return the next state. Many reducers can make modifications through different portions of the state in different reducers, so we avoid chaining actions in our components and we avoid triggering actions inside our stores/reducers.
 
-Unlike redux, mcfly uses synchrously EventEmitter to make changes in a store.
+When writing component based applications, it is enormously helpful to use Facebook's Flux architecture. It truly complements ReactJS' unidirectional data flow model. Facebook's Flux library provides a Dispatcher, and some examples of how to write Actions and Stores. However, there are no helpers for Action & Store creation, and Stores require 3rd party eventing.
+
+Flaxs is a library that provides all 3 components of Flux architecture, using Facebook's Dispatcher, and providing factories for Actions & Stores.
+
+### Forked from
+
+*Flaxs* was created initially as a fork of [McFly](https://github.com/kenwheeler/mcfly).  
+Thanks to [kenwheeler](https://github.com/kenwheeler) for letting this project to happen.
+
+
+## Examples
+
+You can review in detail our [examples guideline page](./tree/master/examples/README.md):
+
+## Demo Page
+
+Right now, we don't have a demo page, nonetheless we have an examples folder which will allow us to explain in detail the potential of Flaxs.
+
+## Dispatcher
+
+Flaxs uses Facebook Flux's dispatcher. When Flaxs is instantiated, a single dispatcher instance is created and can be accessed like shown below:
+
+```javascript
+import { flaxs } from 'flaxs';
+
+return flaxs.dispatcher;
+```
+In fact, all created Actions & Stores are also stored on the Flaxs object as `actions` and `stores` respectively.
+
+## Stores
+
+**Stores in Flaxs are used to preserve compatibility with McFly approach, but are not recommended to use for new projects.**
+
+Since Flaxs brings the `reducer` functions, we don't need different places to store the state of the application.  Instead we use the `MasterStore` explained in this document forward.
+
+When a store is created, its methods parameter specifies what public methods should be added to the Store object. Every store is automatically registered with the Dispatcher and the `dispatcherID` is stored on the Store object itself, for use in `waitFor` methods.
+
+Creating a store with Flaxs using pure functions, you do this:
+
+```javascript
+var _todos = [];
+
+const addTodo = (todos, text) => ([
+  ...todos,
+  text,
+]);
+
+const TodoStore = flaxs.createStore({
+
+  getTodos: function() {
+    return _todos;
+  }
+
+}, function({ actionType, params }){
+  let newTodos;
+
+  switch(actionType) {
+  case 'ADD_TODO':
+    if (!_todos.includes(params.text)) {
+      newTodos = addTodo(_todos, params.text);
+    }
+    break;
+  }
+
+  if (newTodos !== undefined && newTodos !== _todos) {
+    _todos = Object.freeze(newTodos);
+    TodoStore.emitChange();
+  }
+});
+```
+
+Use `Dispatcher.waitFor` if you need to ensure handlers from other stores run first.
+
+```js
+case 'ADD_ANOTHER_TODO': {
+  flaxs.dispatcher.waitFor([OtherStore.dispatcherID]);
+  const someValue = OtherStore.getSomeValue();
+  if (!_todos.includes(someValue)) {
+    newTodos = addTodo(_todos, someValue);
+  }
+  break;
+}
+```
+
+Stores are also created a with a ReactJS component mixin that adds and removes store listeners that call a **storeDidChange** component method.
+
+### React Integration
+
+Adding Store eventing to your component is as easy as:
+
+```javascript
+const { TodoStore } from '../stores/TodoStore';
+
+var TodoApp = React.createClass({
+
+  mixins: [TodoStore.mixin],
+
+  render() {}
+})
+```
+
+**Important**.  The mixin component created in the store, is preserved to keep compatibility with McFly as well, but will get deprecated once `react-flaxs` project sees the light.  Flaxs will not contain itself any dependency from ReactJS.
+
+## Reducers
+
+Unlike redux, flaxs uses asynchronously an EventEmitter to make changes in a store.  This was part of the heritage from mcFly project.
 
 #### The Master Store
 
-Master store is contained in every mcfly instance.  You can see that this store saves the references for all the payload callbacks registered as 'Reducers' so we can reuse the AppDispatcher.waitFor using those identifiers to wait for other reducers.
+Master store is contained in every fl instance.  You can see that this store saves the references for all the payload callbacks registered as 'Reducers' so we can reuse the `flaxs.dispatcher.waitFor` to wait for other reducers as well.
 
-The 'reducer' makes a check in the state to see if there was a change, then evaluates whether to emit a change for the master store or not.
+The 'reducer' makes a check in the reduced state object to see if there was a change, then evaluates whether to emit a change for the master store or not.
+
+Similar to redux, if the reduced state object is not changed, but *mutated* instead, then the master store won't emit changes to all connected components.
 
 This store has a `mergeState(newState)` function, which will merge all the initial states dictated by the reducers once they are registered.  Ideally a place where to register all the reducers is just right after the application loads.
 
@@ -130,6 +134,8 @@ Once the application is initially loaded we can modify the state on the fly via 
 Considering the store example, a reducer looks like this:
 
 ```js
+import { flaxs } from 'flaxs';
+
 let initialState = {
   todos: []
 };
@@ -144,8 +150,8 @@ function addTodo(state, text) {
   return state;
 }
 
-var TodoStore = mcFly.createReducer(
-  'TodoListReducer',
+const TodoListReducer = flaxs.createReducer(
+  'listReducer',
   (state, {actionType, ...params}) => {
     switch (actionType) {
       case 'ADD_TODO':
@@ -154,22 +160,22 @@ var TodoStore = mcFly.createReducer(
     }
     return state;
   },
-  initialState
+  initialState,
 );
 ```
 
 You can always create your `Connect` components by using:
 
 ```js
-mcfly.store.state;
-// returns { todos: ['Todo 1', 'etc...'] }
+flaxs.store.state;
+// returns { listReducer: { todos: ['Todo 1', 'etc...'] } }
 ```
 
 You can wait for your reducer to be finished like:
 
 ```js
 case 'ADD_TODO':
-  flux.dispatcher.waitFor('TodoListReducer');
+  flaxs.dispatcher.waitFor('TodoListReducer');
   // Your state update goes here.
 ```
 
@@ -177,7 +183,7 @@ or wait for several reducers like:
 
 ```js
 case 'ADD_TODO':
-  flux.dispatcher.waitFor(['TodoListReducer', 'AnotherReducer']);
+  flaxs.dispatcher.waitFor(['TodoListReducer', 'AnotherReducer']);
   // Your state update goes here.
 ```  
 
@@ -189,19 +195,19 @@ An easy example would be to subscribe to changes of the master store, since that
 class Connection extends Component {
   constructor(props, context) {
     super(props, context);
-    this.state = mapStateToProps(mcfly.store.state);
+    this.state = mapStateToProps(flaxs.store.state);
     // mapStateToProps() assures the state reference is changed
     // if the master store state
     this.storeDidChange = this.storeDidChange.bind(this);
   }
   componentWillMount() {
-    mcfly.store.addChangeListener(this.storeDidChange);
+    flaxs.store.addChangeListener(this.storeDidChange);
   }
   componentWillUnmount() {
-    mcfly.store.removeChangeListener(this.storeDidChange);
+    flaxs.store.removeChangeListener(this.storeDidChange);
   }
   storeDidChange() {
-    const newState = mapStateToProps(mcfly.store.state);
+    const newState = mapStateToProps(flaxs.store.state);
 
     if (newState !== this.state)) {
       this.setState(newState);
@@ -215,22 +221,22 @@ class Connection extends Component {
 
 You can create as many connectors as you wish, in order to make your components reactive.
 
+Eventually the *connectors* will be implemented and extended in `react-flaxs` to integrate it with ReactJS.
+
 ## Actions
 
-McFly's **createActions** method creates an Action Creator object with the supplied singleton object. The supplied methods are inserted into a Dispatcher.dispatch call and returned with their original name, so that when you call these methods, the dispatch takes place automatically.
+Flaxs's **createActions** method creates an Action Creator object with the supplied singleton object. The supplied methods are inserted into a Dispatcher.dispatch call and returned with their original name, so that when you call these methods, the dispatch takes place automatically.
 
 Adding actions to your app looks like this:
 
 ```javascript
-var mcFly = require('../controller/mcFly');
+import { flaxs } from 'flaxs';
 
-var TodoActions = mcFly.createActions({
-  addTodo: function(text) {
-    return {
-      actionType: 'ADD_TODO',
-      text: text
-    }
-  }
+const TodoActions = flaxs.createActions({
+  addTodo: (text) => ({
+    actionType: 'ADD_TODO',
+    text,
+  }),
 });
 ```
 
@@ -242,12 +248,12 @@ http://jsfiddle.net/thekenwheeler/32hgqsxt/
 
 ## API
 
-### McFly
+### Flaxs
 
 ```javascript
-var McFly = require('mcfly');
+var Flaxs = require('mcfly');
 
-var mcFly = new McFly();
+var flaxs = new Flaxs();
 ```
 
 ### createStore
