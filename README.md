@@ -1,7 +1,7 @@
 # Flaxs
 
 ```
-const Flaxs = Flux + Redux.principles().
+const Flaxs = Flux + Redux.principles()
 ```
 Flaxs incorporates a flux architecture reusing Facebook's Flux `Dispatcher` principle and the Event publish/subscribe pattern.  
 Motivated by Redux and Flux, reducers are reduced-pure callbacks that modify a single state of the application.  Similar to Stores in McFly but suppressing the getters object and incorporating by default the global state of the master store.
