@@ -9,7 +9,7 @@
   ],
   "files": [
     "index.js",
-    "dist/Flaxs.js"
+    "dist/Flaxs.js",
     "lib/"
   ],
   "main": "index.js",
