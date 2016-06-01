@@ -1,1 +1,1 @@
-module.exports = require('./lib/McFly');
+module.exports = require('./lib/Flaxs');

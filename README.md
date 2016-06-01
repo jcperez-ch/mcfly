@@ -18,7 +18,7 @@ Flaxs is a library that provides all 3 components of Flux architecture, using Fa
 
 ### Forked from
 
-*Flaxs* was created initially as a fork of [McFly](https://github.com/kenwheeler/mcfly).  
+*Flaxs* was created initially as a fork of [McFly v0.0.10](https://github.com/kenwheeler/mcfly).  
 Thanks to [kenwheeler](https://github.com/kenwheeler) for letting this project to happen.
 
 
