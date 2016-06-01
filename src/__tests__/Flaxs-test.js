@@ -23,6 +23,7 @@ describe('Flaxs', () => {
   mockStore = flaxs.createStore({
     getItems: () => testItems,
   }, function(payload) {
+    expect(this).toBe(mockStore);
     switch(payload.actionType) {
       case TestConstants.TEST_ADD:
         testItems.push(payload.item);

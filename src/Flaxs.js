@@ -32,9 +32,10 @@ class Flaxs {
    * @param {function} callback - Callback method for Dispatcher dispatches
    * @return {object} - Returns instance of Store
    */
-  createStore(methods,callback) {
-    var store = new Store(methods,callback);
-    store.dispatcherID = this.dispatcher.register(store.callback);
+  createStore(methods, callback, initialState = {}) {
+    const store = new Store(methods, callback, initialState);
+    store.dispatcherID = this.dispatcher.register(store.callback.bind(store));
+
     this.stores.push(store);
     return store;
   }
