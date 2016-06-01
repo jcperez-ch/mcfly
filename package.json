@@ -1,5 +1,5 @@
 {
-  "name": "mcfly",
+  "name": "flaxs",
   "version": "1.0.0",
   "description": "Flux architecture made easy",
   "keywords": [
@@ -16,10 +16,10 @@
   "author": "Ken Wheeler",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kenwheeler/mcfly"
+    "url": "https://github.com/jcperez-ch/flaxs"
   },
-  "bugs": "https://github.com/kenwheeler/mcfly/issues",
-  "license": "BSD",
+  "bugs": "https://github.com/jcperez-ch/flaxs/issues",
+  "license": "MIT",
   "scripts": {
     "test": "jest",
     "build": "gulp clean && gulp lib"
