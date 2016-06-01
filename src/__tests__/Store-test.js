@@ -7,6 +7,8 @@ jest.dontMock('../Dispatcher');
 describe('Store', () => {
 
   const { default: Store } = require('../Store');
+  let { flaxs } = require('../Flaxs');
+  const { includes, union } = require('lodash');
 
   let mockStore = new Store({
     testMethod: () => true,
@@ -16,6 +18,47 @@ describe('Store', () => {
         return true;
       break;
     }
+  });
+
+  const mockDispatchCallback = function({ actionType, ...params }) {
+    let newState;
+    switch(actionType) {
+      case 'READY':
+        newState = { ...this.state, loaded: true };
+        break;
+      case 'ADD':
+        if (!includes(this.state.todos, params.item)) {
+          newState = {
+            ...this.state,
+            todos: [
+              ...this.state.todos,
+              params.item,
+            ],
+          };
+        }
+        break;
+      case 'ADD_ALL': {
+        const todos = union(this.state.todos, params.items);
+        if (!isEqual(this.state.todos, todos)) {
+          newState = {
+            ...this.state,
+            todos,
+          };
+        }
+        break;
+      }
+      default:
+        return true;
+    }
+    const currentState = this.emitChangeIfStoreChanged(newState);
+    expect(currentState.loaded).toBe(true);
+  };
+
+  const mockStoreWithState = flaxs.createStore({
+    testMethod: () => true,
+  }, mockDispatchCallback, {
+    loaded: false,
+    todos: [],
   });
 
   it('should return a new instance with methods attached via the methods argument', () => {
@@ -75,9 +118,25 @@ describe('Store', () => {
 
   });
 
+  it('should store values on the state', () => {
+
+    expect(mockStoreWithState.state).toBeDefined();
+    const beforeReadyState = mockStoreWithState.state;
+    flaxs.dispatcher.dispatch({
+      actionType: 'READY'
+    });
+    expect(mockStoreWithState.state).not.toBe(beforeReadyState);
+
+    flaxs.dispatcher.dispatch({
+      actionType: 'ADD',
+      item: 'First Item',
+    });
+
+    expect(mockStoreWithState.state.todos.length).toBe(1);
+  });
+
   describe('MasterStore', () => {
     const { createStore } = require('../Flaxs');
-    let flaxs;
 
     beforeEach(() => {
       flaxs = createStore({ name: 'test' });

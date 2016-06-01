@@ -40,9 +40,10 @@ class Store {
    * @param {function} callback - Callback method for Dispatcher dispatches
    * @constructor
    */
-  constructor(methods = {}, callback = () => true) {
+  constructor(methods = {}, callback = () => true, initialState = {}) {
     const self = this;
     this.callback = callback;
+    this.state = Object.freeze(initialState);
     iv(!methods.callback, '"callback" is a reserved name and cannot be used as a method name.');
     iv(!methods.mixin,'"mixin" is a reserved name and cannot be used as a method name.');
     iv(!methods.dispatcherIds,'"dispatcherIds" is a reserved name and cannot be used as a method name.');
@@ -106,13 +107,9 @@ class Store {
   removeChangeListener(callback) {
     this.removeListener('change', callback);
   }
-}
 
-class MasterStore extends Store {
-  constructor(initialState = {}) {
-    super();
-    this.state = Object.freeze(initialState);
-    this.dispatcherIds = {};
+  addMethods(methods) {
+    assign(this, methods);
   }
 
   mergeState(namespace, state) {
@@ -123,8 +120,19 @@ class MasterStore extends Store {
     }
   }
 
-  addMethods(methods) {
-    assign(this, methods);
+  emitChangeIfStoreChanged(newState) {
+    if (newState && newState !== this.state) {
+      this.state = Object.freeze(newState);
+      this.emitChange();
+    }
+    return this.state;
+  }
+}
+
+class MasterStore extends Store {
+  constructor(initialState = {}) {
+    super({}, undefined, initialState);
+    this.dispatcherIds = {};
   }
 
   /**
