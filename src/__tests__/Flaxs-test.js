@@ -142,6 +142,5 @@ describe('Flaxs', () => {
 
     await mockActionsFactory.remove(testItem);
     expect(flaxs.store.state.reducer.removes).toEqual(6);
-
   });
 });

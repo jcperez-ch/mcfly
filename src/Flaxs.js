@@ -16,12 +16,12 @@ class Flaxs {
    *
    * @constructor
    */
-  constructor() {
+  constructor(initialState = {}) {
     this.actions = {};
     this.stores = [];
     this.reducers = {};
     this.dispatcher = Dispatcher;
-    this.store = new MasterStore();
+    this.store = new MasterStore(initialState);
   }
 
   /**
@@ -61,11 +61,11 @@ class Flaxs {
    * @return {object} - Returns an instance of
    */
   createReducer(namespace, reducer, initialState = {}) {
-    this.store.mergeState({ [namespace]: initialState });
+    this.store.mergeState(namespace, initialState);
     this.store.addDispatcherId(namespace, this.dispatcher.register((payload) => {
-      const state = reducer(this.store.state[namespace], payload);
+      const state = Object.freeze(reducer(this.store.state[namespace], payload));
       if (state !== this.store.state[namespace]) {
-        this.store.mergeState({ [namespace]: state } );
+        this.store.mergeState(namespace, state);
         this.store.emitChange();
       }
       return true;
@@ -75,4 +75,11 @@ class Flaxs {
   }
 }
 
-export const flaxs = new Flaxs();
+let flaxs = new Flaxs();
+export default Flaxs;
+export function createStore(initialState = {}) {
+  flaxs = new Flaxs(initialState);
+  return flaxs;
+}
+
+export { flaxs };

@@ -2,7 +2,30 @@
 
 import { EventEmitter } from 'events';
 import iv from 'invariant';
-import { assign, compact, includes, isArray, isString, map } from 'lodash';
+import { assign, compact, get, includes, isArray, isString, map } from 'lodash';
+
+/**
+ * Private method used by the MasterStore to recursevely freeze the state in case
+ * a reducer is created as a nested namespace.
+ * @param  {string} namespace
+ * @param  {object} state
+ * @return {object} The recursevely frozen resulted state;
+ */
+const _recursivelyMergeState = (initialState, namespace, state) => {
+  const multilevelNamespace = namespace.match(/^[a-z\d]*\./);
+
+  if (multilevelNamespace !== null) {
+    const parentNamespace = namespace.substring(0, multilevelNamespace[0].length - 1);
+    const childNamespace = namespace.substring(multilevelNamespace[0].length);
+    return Object.freeze(assign({},
+        initialState,
+        { [parentNamespace]: _recursivelyMergeState(get(initialState, parentNamespace), childNamespace, state) },
+      )
+    );
+  }
+
+  return Object.freeze(assign({}, initialState, { [namespace]: state }));
+}
 
 /**
  * Store class
@@ -17,11 +40,13 @@ class Store {
    * @param {function} callback - Callback method for Dispatcher dispatches
    * @constructor
    */
-  constructor(methods, callback) {
+  constructor(methods = {}, callback = () => true) {
     const self = this;
     this.callback = callback;
     iv(!methods.callback, '"callback" is a reserved name and cannot be used as a method name.');
     iv(!methods.mixin,'"mixin" is a reserved name and cannot be used as a method name.');
+    iv(!methods.dispatcherIds,'"dispatcherIds" is a reserved name and cannot be used as a method name.');
+    iv(!methods.state, '"state" is a reserved name and cannot be used as a method name.');
     assign(this, EventEmitter.prototype, methods);
     this.mixin = {
       componentDidMount: function() {
@@ -84,16 +109,18 @@ class Store {
 }
 
 class MasterStore extends Store {
-  constructor(methods = {}, callback = () => true, initialState = {}) {
-    iv(!methods.dispatcherIds,'"dispatcherIds" is a reserved name and cannot be used as a method name.');
-    iv(!methods.state, '"state" is a reserved name and cannot be used as a method name.');
-    super(methods, callback);
-    this.state = initialState;
+  constructor(initialState = {}) {
+    super();
+    this.state = Object.freeze(initialState);
     this.dispatcherIds = {};
   }
 
-  mergeState(state) {
-    this.state = Object.freeze(assign({}, this.state, state));
+  mergeState(namespace, state) {
+    const prevState = get(this.state, namespace);
+    if (prevState !== state) {
+      const newState = Object.isFrozen(state) ? state : Object.freeze(state)
+      this.state = _recursivelyMergeState(this.state, namespace, newState);
+    }
   }
 
   addMethods(methods) {

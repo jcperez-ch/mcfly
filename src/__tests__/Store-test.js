@@ -1,11 +1,12 @@
 // __tests__/Store-test.js
 
 jest.dontMock('../Store');
+jest.dontMock('../Flaxs');
 jest.dontMock('../Dispatcher');
 
 describe('Store', () => {
 
-  const Store = require('../Store').default;
+  const { default: Store } = require('../Store');
 
   let mockStore = new Store({
     testMethod: () => true,
@@ -74,4 +75,64 @@ describe('Store', () => {
 
   });
 
+  describe('MasterStore', () => {
+    const { createStore } = require('../Flaxs');
+    let flaxs;
+
+    beforeEach(() => {
+      flaxs = createStore({ name: 'test' });
+    });
+
+    it('should have an already defined store', () => {
+      expect(flaxs.store.state).toBeDefined();
+      expect(flaxs.store.state.name).toBe('test');
+    });
+
+    it('should merge states', () => {
+      flaxs.store.mergeState('user', { info: null });
+
+      expect(flaxs.store.state.user).toEqual({ info: null });
+    });
+
+    it('should contain frozen referenced objects', () => {
+      flaxs.store.mergeState('user', { info: {
+        status: 'ACTIVE',
+        userType: 'GUEST',
+      } });
+
+      expect(Object.isFrozen(flaxs.store.state)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.name)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.user.info)).toBe(false);
+    });
+
+    it('should create a tree object if the namespace contains dots', () => {
+      flaxs.store.mergeState('user', {
+        status: 'ACTIVE',
+        userType: 'GUEST',
+      });
+
+      flaxs.store.mergeState('user.preferences', {
+        language: 'en',
+        color: 'blue',
+        notifications: { push: true, browser: false },
+      });
+
+      expect(flaxs.store.state.user).toEqual({
+        status: 'ACTIVE',
+        userType: 'GUEST',
+        preferences: {
+          language: 'en',
+          color: 'blue',
+          notifications: { push: true, browser: false },
+        },
+      });
+
+      expect(Object.isFrozen(flaxs.store.state)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.user.preferences)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.user.preferences.notifications)).toBe(false);
+
+    });
+  });
 });
