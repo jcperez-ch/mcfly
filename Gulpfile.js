@@ -4,11 +4,6 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var del = require('del');
 
-var browserifyConfig = {
-  entries: ['./index.js'],
-  standalone: 'Flaxs'
-};
-
 gulp.task('clean', function(cb) {
   del(['lib/', 'dist/'], cb);
 });
@@ -22,10 +17,15 @@ gulp.task('lib', function() {
 });
 
 gulp.task('browserify', ['lib'], function() {
-  return browserify(browserifyConfig)
-          .bundle()
-          .pipe(source('Flaxs.js'))
-          .pipe(gulp.dest('./dist/'))
+  return browserify({
+    entries: ['./index.js'],
+    standalone: 'Flaxs'
+  }).plugin('minifyify', { map: false, uglify: true })
+    .bundle(function() {
+
+    })
+    .pipe(source('Flaxs.js'))
+    .pipe(gulp.dest('./dist/'))
 });
 
 gulp.task('publish', ['clean', 'default']);

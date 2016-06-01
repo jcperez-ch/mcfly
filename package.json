@@ -9,8 +9,8 @@
   ],
   "files": [
     "index.js",
-    "lib/",
-    "LICENSE"
+    "dist/Flaxs.js"
+    "lib/"
   ],
   "main": "index.js",
   "author": "Ken Wheeler",
@@ -22,7 +22,11 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "build": "gulp clean && gulp lib"
+    "build:clean": "gulp clean",
+    "build:lib": "gulp lib",
+    "build:dist": "gulp",
+    "build": "npm run build:clean && npm run build:lib && npm run build:dist",
+    "prepublish": "npm run build"
   },
   "jest": {
     "rootDir": "src",
@@ -61,6 +65,7 @@
     "gulp-babel": "^6.1.2",
     "gulp-replace": "^0.5.4",
     "jest-cli": "^12.1.1",
+    "minifyify": "^7.3.3",
     "vinyl-source-stream": "^0.1.1"
   }
 }

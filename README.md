@@ -248,29 +248,25 @@ http://jsfiddle.net/thekenwheeler/32hgqsxt/
 
 ## API
 
-### Flaxs
+### Instantiating Flaxs
+
+There are 3 ways to have a Flaxs instance fluxing the application:
 
 ```javascript
-var Flaxs = require('mcfly');
+import Flaxs from 'flaxs';
 
-var flaxs = new Flaxs();
+const flaxs = new Flaxs({ ...initialState });
 ```
-
-### createStore
-
+or
 ```javascript
-/*
- * @param {object} methods - Public methods for Store instance
- * @param {function} callback - Callback method for Dispatcher dispatches
- * @return {object} - Returns instance of Store
- */
+import { flaxs } from 'flaxs';
+
+// const flaxs contains an already instantiated Flaxs() object with an empty initialState;
 ```
-
-### createActions
-
+or
 ```javascript
-/**
- * @param {object} actions - Object with methods to create actions with
- * @constructor
- */
+import { createStore } from 'flaxs';
+
+const flaxs = createStore({ ...initialState });
+// flaxs object will be the already instantiated Flaxs() instance, so you don't have to create a 'new' one;
 ```
