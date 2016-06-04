@@ -1,7 +1,7 @@
 import Dispatcher from './Dispatcher';
 import Store, { MasterStore } from './Store';
 import ActionsFactory from './ActionsFactory';
-import { assign } from 'lodash';
+import { assign, difference, every, get, reduce } from 'lodash';
 
 /**
  * Main McFly Class
@@ -61,24 +61,43 @@ class Flaxs {
    */
   createReducer(namespace, reducer, initialState = {}) {
     this.store.mergeState(namespace, initialState);
-    this.store.addDispatcherId(namespace, this.dispatcher.register((payload) => {
+    const dispatcherID = this.dispatcher.register((payload) => {
+      const dispatcherHandled = get(this.dispatcher, '_isHandled');
+      const pendingReducers = reduce(
+        dispatcherHandled, (accPending, isHandled, pendingDispatcherID) => {
+          const isPending = !isHandled && dispatcherID !== pendingDispatcherID;
+          const isFromStore = every(
+            this.stores, (store) => store.dispatcherID !== pendingDispatcherID
+          );
+          if (isPending && isFromStore) {
+            accPending.push(pendingDispatcherID);
+          }
+          return accPending;
+        }, []
+      );
+      const restOfReducers = difference(this.store.getDispatchTokens(), [dispatcherID]);
+      if (restOfReducers.length === pendingReducers.length) {
+        this.store.freezeState();
+      }
       const state = Object.freeze(reducer(this.store.state[namespace], payload));
+
       if (state !== this.store.state[namespace]) {
         this.store.mergeState(namespace, state);
-        this.store.emitChange();
       }
+
+      if (pendingReducers.length === 0) {
+        this.store.emitChangeIfStoreChanged();
+      }
+
       return true;
-    }));
+    });
+    this.store.addDispatcherId(namespace, dispatcherID);
     this.reducers[namespace] = reducer;
     return this;
   }
 }
 
-let flaxs = new Flaxs();
-export default Flaxs;
+const flaxs = new Flaxs();
 
-// TODO comment this
-export function createStore(initialState = {}) {
-  flaxs = new Flaxs(initialState);
-  return flaxs;
-}
+export default Flaxs;
+export { flaxs };

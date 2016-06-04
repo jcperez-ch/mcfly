@@ -250,7 +250,7 @@ http://jsfiddle.net/thekenwheeler/32hgqsxt/
 
 ### Instantiating Flaxs
 
-There are 3 ways to have a Flaxs instance fluxing the application:
+There are 2 ways to have a Flaxs instance fluxing the application:
 
 ```javascript
 import Flaxs from 'flaxs';
@@ -262,11 +262,4 @@ or
 import { flaxs } from 'flaxs';
 
 // const flaxs contains an already instantiated Flaxs() object with an empty initialState;
-```
-or
-```javascript
-import { createStore } from 'flaxs';
-
-const flaxs = createStore({ ...initialState });
-// flaxs object will be the already instantiated Flaxs() instance, so you don't have to create a 'new' one;
 ```
