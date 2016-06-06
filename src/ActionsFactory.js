@@ -13,10 +13,11 @@ export default class ActionsFactory {
    * @param {object} actions - Object with methods to create actions with
    * @constructor
    */
-  constructor(actions) {
+  constructor(actions, isAsync = true) {
     forEach(actions, (actionCallback, actionName) => {
-      const action = new Action(actionCallback);
-      this[actionName] = action.dispatch.bind(action);
+      const action = new Action(actionCallback, actionName);
+
+      this[actionName] = isAsync ? action.dispatch.bind(action) : action.syncDispatch.bind(action);
     });
   }
 }

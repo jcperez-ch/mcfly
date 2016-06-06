@@ -10,7 +10,7 @@ jest.dontMock('../Dispatcher');
 
 describe('Flaxs', () => {
 
-  const Flaxs = require('../Flaxs').default;
+  const { flaxs } = require('../Flaxs');
   const Store = require('../Store').default;
   const ActionsFactory = require('../ActionsFactory').default;
   const TestConstants = {
@@ -20,8 +20,6 @@ describe('Flaxs', () => {
   };
 
   const testItems = [];
-
-  const flaxs = new Flaxs();
 
   const mockStore = flaxs.createStore({
     getItems: () => testItems,
@@ -54,6 +52,17 @@ describe('Flaxs', () => {
       value,
     }),
   });
+
+  const mockSyncActionsFactory = flaxs.createActions({
+    add: (item) => ({
+      actionType: TestConstants.TEST_ADD,
+      item,
+    }),
+    remove: (item) => ({
+      actionType: TestConstants.TEST_REMOVE,
+      item,
+    }),
+  }, false);
 
   flaxs.createReducer('reducer', (state, { actionType, item }) => {
     switch (actionType) {
@@ -178,5 +187,17 @@ describe('Flaxs', () => {
     await mockActionsFactory.consume(5);
     expect(flaxs.store.state.flags).toEqual({ consumed: 2 });
     expect(flaxs.store.emitChange.mock.calls.length).toBe(3);
+  });
+
+  it('should synchronously dispatch actions', () => {
+
+    const testItem = 2;
+
+    expect(flaxs.store.state.reducer.adds).toEqual(6);
+    mockSyncActionsFactory.add(testItem);
+    expect(flaxs.store.state.reducer.adds).toEqual(8);
+
+    mockSyncActionsFactory.remove(testItem);
+    expect(flaxs.store.state.reducer.removes).toEqual(8);
   });
 });
