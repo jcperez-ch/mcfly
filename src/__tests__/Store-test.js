@@ -1,4 +1,5 @@
 // __tests__/Store-test.js
+/* eslint-disable global-require */
 
 jest.dontMock('../Store');
 jest.dontMock('../Flaxs');
@@ -7,22 +8,24 @@ jest.dontMock('../Dispatcher');
 describe('Store', () => {
 
   const { default: Store } = require('../Store');
-  let { flaxs } = require('../Flaxs');
-  const { includes, union } = require('lodash');
+  const Flaxs = require('../Flaxs').default;
+  const { includes, union, isEqual } = require('lodash');
+  let flaxs = new Flaxs();
 
-  let mockStore = new Store({
+  const mockStore = new Store({
     testMethod: () => true,
   }, ({ actionType }) => {
-    switch(actionType) {
+    switch (actionType) {
       case 'ADD_TEST':
         return true;
-      break;
+      default:
+        return true;
     }
   });
 
-  const mockDispatchCallback = function({ actionType, ...params }) {
+  function mockDispatchCallback({ actionType, ...params }) {
     let newState;
-    switch(actionType) {
+    switch (actionType) {
       case 'READY':
         newState = { ...this.state, loaded: true };
         break;
@@ -52,7 +55,8 @@ describe('Store', () => {
     }
     const currentState = this.emitChangeIfStoreChanged(newState);
     expect(currentState.loaded).toBe(true);
-  };
+    return true;
+  }
 
   const mockStoreWithState = flaxs.createStore({
     testMethod: () => true,
@@ -62,68 +66,49 @@ describe('Store', () => {
   });
 
   it('should return a new instance with methods attached via the methods argument', () => {
-
     expect(mockStore.testMethod).toBeDefined();
-
   });
 
   it('should attach the supplied callback to the new instance', () => {
-
     expect(mockStore.callback).toBeDefined();
-
   });
 
   it('should be merged with EventEmitter', () => {
-
-    expect("on" in mockStore).toEqual(true);
-    expect("removeListener" in mockStore).toEqual(true);
-    expect("emit" in mockStore).toEqual(true);
-
+    expect('on' in mockStore).toEqual(true);
+    expect('removeListener' in mockStore).toEqual(true);
+    expect('emit' in mockStore).toEqual(true);
   });
 
   it('should create a mixin property', () => {
-
     expect(mockStore.mixin).toBeDefined();
-
   });
 
   it('should return a dispatcherID when getDispatchToken is called', () => {
-
     mockStore.dispatcherID = 5;
     expect(mockStore.getDispatchToken()).toEqual(5);
-
   });
 
   it('should throw if a supplied method is named "callback"', () => {
-
     expect(() => {
       Store.constructor({
-        callback: function(){
-          return true;
-        }
-      },function(payload){});
+        callback: () => true,
+      }, () => {});
     }).toThrow();
-
   });
 
   it('should throw if a supplied method is named "mixin"', () => {
-
     expect(() => {
       Store.constructor({
-        mixin: function(){
-          return true;
-        }
-      },function(payload){});
+        mixin: () => true,
+      }, () => {});
     }).toThrow();
-
   });
 
   it('should store values on the state', () => {
-
     expect(mockStoreWithState.state).toBeDefined();
     const beforeReadyState = mockStoreWithState.state;
     flaxs.dispatcher.dispatch({
-      actionType: 'READY'
+      actionType: 'READY',
     });
     expect(mockStoreWithState.state).not.toBe(beforeReadyState);
 
@@ -191,7 +176,6 @@ describe('Store', () => {
       expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
       expect(Object.isFrozen(flaxs.store.state.user.preferences)).toBe(true);
       expect(Object.isFrozen(flaxs.store.state.user.preferences.notifications)).toBe(false);
-
     });
   });
 });
