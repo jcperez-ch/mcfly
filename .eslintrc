@@ -1,0 +1,12 @@
+{
+  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "env": {
+    "node": true,
+    "jasmine": true,
+    "jest": true
+  },
+  "rules": {
+    "padded-blocks": [0]
+  }
+}
