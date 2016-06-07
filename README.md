@@ -1,5 +1,8 @@
 # Flaxs
 
+[![Build Status](https://travis-ci.org/jcperez-ch/flaxs.svg?branch=master)](https://travis-ci.org/jcperez-ch/flaxs)
+[![npm version](https://img.shields.io/npm/v/flaxs.svg?style=flat-square)](https://www.npmjs.com/package/flaxs)
+
 ```
 const Flaxs = Flux + Redux.principles()
 ```
