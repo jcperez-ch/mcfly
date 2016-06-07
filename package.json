@@ -13,7 +13,12 @@
     "lib/"
   ],
   "main": "index.js",
-  "author": "Ken Wheeler",
+  "author": "JC Perez Chavez <jc.perezchavez@gmail.com>",
+  "contributors": [
+    "Ken Wheeler",
+    "JC Perez Chavez <jc.perezchavez@gmail.com>",
+    "Thomas Andreo",
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/jcperez-ch/flaxs"
