@@ -37,7 +37,6 @@ class Action {
       new Promise((resolve, reject) => {
         if (!payload) return reThrow(reject, message('payloadObject'));
         if (!payload.actionType) {
-          console.log(999, message('payloadRequiresActionType'));
           return reThrow(reject, message('payloadRequiresActionType'));
         }
 
