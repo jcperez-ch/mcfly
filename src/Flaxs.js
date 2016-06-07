@@ -1,5 +1,3 @@
-'use strict';
-
 import Dispatcher from './Dispatcher';
 import Store, { MasterStore } from './Store';
 import ActionsFactory from './ActionsFactory';
@@ -48,7 +46,7 @@ class Flaxs {
    * @return {object} - Returns instance of ActionsFactory
    */
   createActions(actions) {
-    var actionFactory = new ActionsFactory(actions);
+    const actionFactory = new ActionsFactory(actions);
     assign(this.actions, actionFactory);
     return actionFactory;
   }
@@ -78,9 +76,9 @@ class Flaxs {
 
 let flaxs = new Flaxs();
 export default Flaxs;
+
+// TODO comment this
 export function createStore(initialState = {}) {
   flaxs = new Flaxs(initialState);
   return flaxs;
 }
-
-export { flaxs };

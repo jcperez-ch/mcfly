@@ -1,5 +1,3 @@
-'use strict';
-
 import Action from './Action';
 import { forEach } from 'lodash';
 

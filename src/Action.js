@@ -1,13 +1,12 @@
-'use strict';
-
 import Dispatcher from './Dispatcher';
 
 function reThrow(reject, error) {
   if (error && error.stack) {
-    console.error(error.stack);
+    console.error(error.stack); // eslint-disable-line no-console
   }
   return reject(error);
 }
+
 
 /**
  * Action class
@@ -24,17 +23,20 @@ class Action {
     this.callback = callback;
   }
 
+
   /**
    * Calls callback method from Dispatcher
    *
    * @param {...*} arguments - arguments for callback method
    * @returns Promise object
    */
-  dispatch() {
-    return Promise.resolve(this.callback.apply(this, arguments)).then((payload) => {
-      return new Promise((resolve, reject) => {
+  dispatch(...args) {
+    return Promise.resolve(this.callback.apply(this, args)).then((payload) =>
+      new Promise((resolve, reject) => {
         if (!payload) return reThrow(reject, 'Payload needs to be an object');
-        if (!payload.actionType) return reThrow(reject, 'Payload object requires an actionType property');
+        if (!payload.actionType) {
+          return reThrow(reject, 'Payload object requires an actionType property');
+        }
 
         try {
           Dispatcher.dispatch(payload);
@@ -43,8 +45,8 @@ class Action {
         }
 
         resolve();
-      });
-    });
+        return true;
+      }));
   }
 }
 

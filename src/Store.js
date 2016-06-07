@@ -1,5 +1,3 @@
-'use strict';
-
 import { EventEmitter } from 'events';
 import iv from 'invariant';
 import { assign, compact, get, includes, isArray, isString, map } from 'lodash';
@@ -11,21 +9,24 @@ import { assign, compact, get, includes, isArray, isString, map } from 'lodash';
  * @param  {object} state
  * @return {object} The recursevely frozen resulted state;
  */
-const _recursivelyMergeState = (initialState, namespace, state) => {
+const recursivelyMergeState = (initialState, namespace, state) => {
   const multilevelNamespace = namespace.match(/^[a-z\d]*\./);
 
   if (multilevelNamespace !== null) {
-    const parentNamespace = namespace.substring(0, multilevelNamespace[0].length - 1);
-    const childNamespace = namespace.substring(multilevelNamespace[0].length);
+    const parentNS = namespace.substring(0, multilevelNamespace[0].length - 1);
+    const childNS = namespace.substring(multilevelNamespace[0].length);
+    const extend = {
+      [parentNS]: recursivelyMergeState(get(initialState, parentNS), childNS, state),
+    };
+
     return Object.freeze(assign({},
-        initialState,
-        { [parentNamespace]: _recursivelyMergeState(get(initialState, parentNamespace), childNamespace, state) },
-      )
-    );
+      initialState,
+      extend,
+    ));
   }
 
   return Object.freeze(assign({}, initialState, { [namespace]: state }));
-}
+};
 
 /**
  * Store class
@@ -45,35 +46,39 @@ class Store {
     this.callback = callback;
     this.state = Object.freeze(initialState);
     iv(!methods.callback, '"callback" is a reserved name and cannot be used as a method name.');
-    iv(!methods.mixin,'"mixin" is a reserved name and cannot be used as a method name.');
-    iv(!methods.dispatcherIds,'"dispatcherIds" is a reserved name and cannot be used as a method name.');
+    iv(!methods.mixin, '"mixin" is a reserved name and cannot be used as a method name.');
+    iv(!methods.dispatcherIds, '"dispatcherIds" is a reserved name and cannot be used as a method name.');
     iv(!methods.state, '"state" is a reserved name and cannot be used as a method name.');
     assign(this, EventEmitter.prototype, methods);
     this.mixin = {
-      componentDidMount: function() {
+      componentDidMount: function componentDidMount() {
         let warn;
-        let changeFn;
 
         try {
-           warn = (console.warn || console.log).bind(console);
+          warn = (console.warn || console.log).bind(console); // eslint-disable-line no-console
         } catch (e) {
           warn = () => false;
         }
 
-        if(!this.storeDidChange){
-            warn("A component that uses a McFly Store mixin is not implementing storeDidChange. onChange will be called instead, but this will no longer be supported from version 1.0.");
+        this.componentMounted = true;
+
+        if (!this.storeDidChange) {
+          warn('A component that uses a McFly Store mixin is not implementing storeDidChange. onChange will be called instead, but this will no longer be supported from version 1.0.');
         }
-        changeFn = this.storeDidChange || this.onChange;
-        if(!changeFn){
-            warn("A change handler is missing from a component with a McFly mixin. Notifications from Stores are not being handled.");
+        const changeFn = this.storeDidChange || this.onChange;
+        if (!changeFn) {
+          warn('A change handler is missing from a component with a McFly mixin. Notifications from Stores are not being handled.');
         }
-        this.listener = ()=>{ this.isMounted() && changeFn(); }
+        this.listener = () => this.componentMounted && changeFn();
         self.addChangeListener(this.listener);
       },
-      componentWillUnmount: function() {
-        this.listener && self.removeChangeListener(this.listener);
-      }
-    }
+      componentWillUnmount: function componentWillUnmount() {
+        this.componentMounted = false;
+        if (this.listener) {
+          self.removeChangeListener(this.listener);
+        }
+      },
+    };
   }
 
   /**
@@ -115,8 +120,8 @@ class Store {
   mergeState(namespace, state) {
     const prevState = get(this.state, namespace);
     if (prevState !== state) {
-      const newState = Object.isFrozen(state) ? state : Object.freeze(state)
-      this.state = _recursivelyMergeState(this.state, namespace, newState);
+      const newState = Object.isFrozen(state) ? state : Object.freeze(state);
+      this.state = recursivelyMergeState(this.state, namespace, newState);
     }
   }
 
@@ -144,11 +149,13 @@ class MasterStore extends Store {
         map(this.dispatcherIds, dId => dId) :
         [this.dispatcherIds[namespace]];
     }
-    if(!isArray(namespace)) {
+    if (!isArray(namespace)) {
       iv(false, `cannot get dispatcherTokens from a namespace of type ${typeof namespace}.`);
     }
 
-    return compact(map(this.dispatcherIds, (dispacherID, ns) => includes(namespace, ns) ? dispacherID : null));
+    return compact(map(this.dispatcherIds, (dispacherID, ns) => (
+      includes(namespace, ns) ? dispacherID : null))
+    );
   }
 
   /**
