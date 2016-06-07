@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { connect } from '../../connectors/Default'
+import { connect } from 'react-flaxs';
 
 export default class Route extends Component {
   render() {

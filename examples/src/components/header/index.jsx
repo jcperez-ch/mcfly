@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
-import { connect } from '../../connectors/Default';
+import { connect } from 'react-flaxs';
 
 @connect(state => {
   return {

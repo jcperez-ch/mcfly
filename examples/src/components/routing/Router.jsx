@@ -2,7 +2,7 @@ import React, { Component, PropTypes, Children } from 'react';
 import { find, map } from 'lodash';
 
 import RoutingActions from '../../actions/RoutingActions';
-import { connect } from '../../connectors/Default';
+import { connect } from 'react-flaxs';
 
 @connect(state => {
   return {

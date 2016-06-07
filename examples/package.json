@@ -53,11 +53,13 @@
     "webpack-dev-server": "^1.12.1"
   },
   "dependencies": {
+    "flaxs": "file:///home/jcpchavez/others/flaxs",
     "font-awesome": "^4.6.3",
     "history": "^3.0.0",
     "hoist-non-react-statics": "^1.0.6",
     "lodash": "^4.13.1",
     "react": "^0.14.6",
-    "react-dom": "^0.14.6"
+    "react-dom": "^0.14.6",
+    "react-flaxs": "^0.1.0"
   }
 }

@@ -1,4 +1,4 @@
-import { flaxs } from '../../../';
+import { flaxs } from 'flaxs';
 import ActionTypes from '../constants/ActionTypes';
 
 export default flaxs.createActions({
