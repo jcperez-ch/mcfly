@@ -1,4 +1,5 @@
 import Dispatcher from './Dispatcher';
+import message from './Messager';
 
 function reThrow(reject, error) {
   if (error && error.stack) {
@@ -34,9 +35,10 @@ class Action {
   dispatch(...args) {
     return Promise.resolve(this.callback.apply(this, args)).then((payload) =>
       new Promise((resolve, reject) => {
-        if (!payload) return reThrow(reject, 'Payload needs to be an object');
+        if (!payload) return reThrow(reject, message('payloadObject'));
         if (!payload.actionType) {
-          return reThrow(reject, 'Payload object requires an actionType property');
+          console.log(999, message('payloadRequiresActionType'));
+          return reThrow(reject, message('payloadRequiresActionType'));
         }
 
         try {

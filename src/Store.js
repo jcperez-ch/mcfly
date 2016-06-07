@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import iv from 'invariant';
 import { assign, compact, get, includes, isArray, isString, map } from 'lodash';
+import message from './Messager';
 
 /**
  * Private method used by the MasterStore to recursevely freeze the state in case
@@ -45,11 +46,11 @@ class Store {
     const self = this;
     this.callback = callback;
     this.state = Object.freeze(initialState);
-    iv(!methods.callback, '"callback" is a reserved name and cannot be used as a method name.');
-    iv(!methods.mixin, '"mixin" is a reserved name and cannot be used as a method name.');
-    iv(!methods.dispatcherIds, '"dispatcherIds" is a reserved name and cannot be used as a method name.');
-    iv(!methods.state, '"state" is a reserved name and cannot be used as a method name.');
-    iv(!methods.frozenState, '"frozenState" is a reserved name and cannot be used as a method name.');
+    iv(!methods.callback, message('reservedCallback'));
+    iv(!methods.mixin, message('reservedMixin'));
+    iv(!methods.dispatcherIds, message('reservedDispatcherIds'));
+    iv(!methods.state, message('reservedState'));
+    iv(!methods.frozenState, message('reservedFrozenState'));
     assign(this, EventEmitter.prototype, methods);
     this.mixin = {
       componentDidMount: function componentDidMount() {
@@ -64,11 +65,11 @@ class Store {
         this.componentMounted = true;
 
         if (!this.storeDidChange) {
-          warn('A component that uses a McFly Store mixin is not implementing storeDidChange. onChange will be called instead, but this will no longer be supported from version 1.0.');
+          warn(message('noStoreDidChange'));
         }
         const changeFn = this.storeDidChange || this.onChange;
         if (!changeFn) {
-          warn('A change handler is missing from a component with a McFly mixin. Notifications from Stores are not being handled.');
+          warn(message('noCHangeHandler'));
         }
         this.listener = () => this.componentMounted && changeFn();
         self.addChangeListener(this.listener);
@@ -152,7 +153,7 @@ class MasterStore extends Store {
         [this.dispatcherIds[namespace]];
     }
     if (!isArray(namespace)) {
-      iv(false, `cannot get dispatcherTokens from a namespace of type ${typeof namespace}.`);
+      iv(false, message('noDispatcherTokens', typeof namespace));
     }
 
     return compact(map(this.dispatcherIds, (dispacherID, ns) => (
@@ -181,7 +182,7 @@ class MasterStore extends Store {
    */
   addDispatcherId(namespace, dispatcherID) {
     if (namespace !== null && this.dispatcherIds.hasOwnProperty(namespace)) {
-      iv(false, `namespace ${namespace} is already registered with the dispatcher.`);
+      iv(false, message('existingNamespace', namespace));
     }
     this.dispatcherIds[namespace] = dispatcherID;
   }
