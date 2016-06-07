@@ -1,0 +1,18 @@
+.headerContainer {
+  background-color: #6236bf;
+  padding: 0px;
+
+  header {
+    display: block;
+    text-align: right;
+    padding: 10px 0px;
+
+    > a {
+      color: white;
+      padding: 0px;
+      float: left;
+      cursor: pointer;
+    }
+  }
+
+}
