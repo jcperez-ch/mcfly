@@ -151,7 +151,6 @@ class MasterStore extends Store {
         [this.dispatcherIds[namespace]];
     }
     if (!isArray(namespace)) {
-      console.log(55555555, message('noDispatcherTokens', typeof namespace));
       iv(false, message('noDispatcherTokens', typeof namespace));
     }
 
@@ -169,7 +168,6 @@ class MasterStore extends Store {
    */
   addDispatcherId(namespace, dispatcherID) {
     if (namespace !== null && this.dispatcherIds.hasOwnProperty(namespace)) {
-      console.log(55555555, message('existingNamespace', namespace));
       iv(false, message('existingNamespace', namespace));
     }
     this.dispatcherIds[namespace] = dispatcherID;
