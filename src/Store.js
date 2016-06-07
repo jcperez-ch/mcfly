@@ -49,6 +49,7 @@ class Store {
     iv(!methods.mixin, '"mixin" is a reserved name and cannot be used as a method name.');
     iv(!methods.dispatcherIds, '"dispatcherIds" is a reserved name and cannot be used as a method name.');
     iv(!methods.state, '"state" is a reserved name and cannot be used as a method name.');
+    iv(!methods.frozenState, '"frozenState" is a reserved name and cannot be used as a method name.');
     assign(this, EventEmitter.prototype, methods);
     this.mixin = {
       componentDidMount: function componentDidMount() {
@@ -138,14 +139,15 @@ class MasterStore extends Store {
   constructor(initialState = {}) {
     super({}, undefined, initialState);
     this.dispatcherIds = {};
+    this.frozenState = null;
   }
 
   /**
    * Returns dispatch token
    */
-  getDispatchTokens(namespace = []) {
+  getDispatchTokens(namespace = '') {
     if (isString(namespace)) {
-      return !this.dispatcherIds.hasOwnProperty(namespace) ?
+      return namespace === '' || !this.dispatcherIds.hasOwnProperty(namespace) ?
         map(this.dispatcherIds, dId => dId) :
         [this.dispatcherIds[namespace]];
     }
@@ -156,6 +158,18 @@ class MasterStore extends Store {
     return compact(map(this.dispatcherIds, (dispacherID, ns) => (
       includes(namespace, ns) ? dispacherID : null))
     );
+  }
+
+  freezeState() {
+    this.frozenState = this.state;
+  }
+
+  emitChangeIfStoreChanged() {
+    if (this.frozenState !== this.state) {
+      this.frozenState = null;
+      this.emitChange();
+    }
+    return this.state;
   }
 
   /**

@@ -8,9 +8,8 @@ jest.dontMock('../Dispatcher');
 describe('Store', () => {
 
   const { default: Store } = require('../Store');
-  const Flaxs = require('../Flaxs').default;
+  const { flaxs } = require('../Flaxs');
   const { includes, union, isEqual } = require('lodash');
-  let flaxs = new Flaxs();
 
   const mockStore = new Store({
     testMethod: () => true,
@@ -121,15 +120,13 @@ describe('Store', () => {
   });
 
   describe('MasterStore', () => {
-    const { createStore } = require('../Flaxs');
-
     beforeEach(() => {
-      flaxs = createStore({ name: 'test' });
+      flaxs.store.mergeState('startingWith', 'test');
     });
 
     it('should have an already defined store', () => {
       expect(flaxs.store.state).toBeDefined();
-      expect(flaxs.store.state.name).toBe('test');
+      expect(flaxs.store.state.startingWith).toBe('test');
     });
 
     it('should merge states', () => {
@@ -145,7 +142,7 @@ describe('Store', () => {
       } });
 
       expect(Object.isFrozen(flaxs.store.state)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.name)).toBe(true);
+      expect(Object.isFrozen(flaxs.store.state.startingWith)).toBe(true);
       expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
       expect(Object.isFrozen(flaxs.store.state.user.info)).toBe(false);
     });

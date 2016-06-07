@@ -16,6 +16,7 @@ describe('Flaxs', () => {
   const TestConstants = {
     TEST_ADD: 'TEST_ADD',
     TEST_REMOVE: 'TEST_REMOVE',
+    TEST_CONSUME: 'TEST_CONSUME',
   };
 
   const testItems = [];
@@ -47,6 +48,10 @@ describe('Flaxs', () => {
     remove: (item) => ({
       actionType: TestConstants.TEST_REMOVE,
       item,
+    }),
+    consume: (value) => ({
+      actionType: TestConstants.TEST_CONSUME,
+      value,
     }),
   });
 
@@ -126,5 +131,52 @@ describe('Flaxs', () => {
 
     await mockActionsFactory.remove(testItem);
     expect(flaxs.store.state.reducer.removes).toEqual(6);
+  });
+
+  pit(`should emit a single change in master store if multiple reducers changed
+    the state`, async () => {
+    flaxs.store.emitChange = jest.fn();
+    flaxs.createReducer('consumer', (state, { actionType, value }) => {
+      switch (actionType) {
+        case TestConstants.TEST_CONSUME:
+          return value === 5 ? value : state;
+        default:
+      }
+      return state;
+    }, 0);
+
+    flaxs.createReducer('consumed', (state, { actionType, value }) => {
+      switch (actionType) {
+        case TestConstants.TEST_CONSUME:
+          return value === 0 ? state : state + 1;
+        default:
+      }
+      return state;
+    }, 0);
+
+    flaxs.createReducer('flags', (state, { actionType, value }) => {
+      switch (actionType) {
+        case TestConstants.TEST_CONSUME:
+          return value === 0 || value === 5 ? state : { consumed: value };
+        default:
+      }
+      return state;
+    }, { consumed: 0 });
+
+    await mockActionsFactory.consume(9);
+    expect(flaxs.store.state.flags).toEqual({ consumed: 9 });
+    expect(flaxs.store.emitChange.mock.calls.length).toBe(1);
+
+    await mockActionsFactory.consume(0);
+    expect(flaxs.store.state.flags).toEqual({ consumed: 9 });
+    expect(flaxs.store.emitChange.mock.calls.length).toBe(1);
+
+    await mockActionsFactory.consume(2);
+    expect(flaxs.store.state.flags).toEqual({ consumed: 2 });
+    expect(flaxs.store.emitChange.mock.calls.length).toBe(2);
+
+    await mockActionsFactory.consume(5);
+    expect(flaxs.store.state.flags).toEqual({ consumed: 2 });
+    expect(flaxs.store.emitChange.mock.calls.length).toBe(3);
   });
 });
