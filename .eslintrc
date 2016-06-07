@@ -7,6 +7,7 @@
     "jest": true
   },
   "rules": {
-    "padded-blocks": [0]
+    "padded-blocks": [0],
+    "no-console": [2, { allow: ["warn", "error"] }]
   }
 }

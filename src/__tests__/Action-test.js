@@ -2,6 +2,7 @@
 /* eslint-disable global-require */
 
 jest.dontMock('../Action');
+jest.dontMock('../Messager');
 
 describe('Action', () => {
 
