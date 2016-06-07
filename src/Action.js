@@ -19,8 +19,9 @@ class Action {
    * @param {function} callback - Callback method for Action
    * @constructor
    */
-  constructor(callback) {
+  constructor(callback, actionName) {
     this.callback = callback;
+    this.actionName = actionName;
   }
 
 
@@ -47,6 +48,19 @@ class Action {
         resolve();
         return true;
       }));
+  }
+
+  syncDispatch() {
+    const payload = this.callback.apply(this, arguments);
+    const reject = () => true;
+    if (!payload) return reThrow(reject, 'Payload needs to be an object');
+    if (!payload.actionType) return reThrow(reject, 'Payload object requires an actionType property');
+
+    try {
+      Dispatcher.dispatch(payload);
+    } catch (error) {
+      reThrow(reject, error);
+    }
   }
 }
 

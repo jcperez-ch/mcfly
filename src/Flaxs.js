@@ -45,8 +45,8 @@ class Flaxs {
    * @param {object} actions - Action methods
    * @return {object} - Returns instance of ActionsFactory
    */
-  createActions(actions) {
-    const actionFactory = new ActionsFactory(actions);
+  createActions(actions, isAsync = true) {
+    const actionFactory = new ActionsFactory(actions, isAsync);
     assign(this.actions, actionFactory);
     return actionFactory;
   }

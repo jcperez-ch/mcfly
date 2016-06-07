@@ -25,4 +25,22 @@ describe('ActionsFactory', () => {
     expect(mockActionsFactory.testMethodB).toBeDefined();
   });
 
+  it('create new synchronous Actions', () => {
+
+    mockActionsFactory = new ActionsFactory({
+      testMethodA: () => ({
+        actionType: 'TEST_ACTION_A',
+        data: arguments,
+      }),
+      testMethodB: () => ({
+        actionType: 'TEST_ACTION_B',
+        data: arguments,
+      }),
+    }, false);
+
+    expect(mockActionsFactory.testMethodA).toBeDefined();
+    expect(mockActionsFactory.testMethodB).toBeDefined();
+
+  });
+
 });
