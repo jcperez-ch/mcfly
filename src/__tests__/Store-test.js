@@ -4,6 +4,7 @@
 jest.dontMock('../Store');
 jest.dontMock('../Flaxs');
 jest.dontMock('../Dispatcher');
+jest.dontMock('../Messager');
 
 describe('Store', () => {
 
