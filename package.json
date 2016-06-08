@@ -4,8 +4,9 @@
   "description": "const Flaxs = Flux + Redux.principles()",
   "keywords": [
     "flux",
-    "react",
-    "mcfly"
+    "dispatcher",
+    "flaxs",
+    "components"
   ],
   "files": [
     "index.js",

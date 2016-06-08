@@ -192,39 +192,16 @@ case 'ADD_TODO':
 
 # Connecting React components
 
-An easy example would be to subscribe to changes of the master store, since that is the store that emits the events:
+An easy example would be to subscribe to changes of the master store, since that is the store that emits the events.
 
-```js
-class Connection extends Component {
-  constructor(props, context) {
-    super(props, context);
-    this.state = mapStateToProps(flaxs.store.state);
-    // mapStateToProps() assures the state reference is changed
-    // if the master store state
-    this.storeDidChange = this.storeDidChange.bind(this);
-  }
-  componentWillMount() {
-    flaxs.store.addChangeListener(this.storeDidChange);
-  }
-  componentWillUnmount() {
-    flaxs.store.removeChangeListener(this.storeDidChange);
-  }
-  storeDidChange() {
-    const newState = mapStateToProps(flaxs.store.state);
+The best tool for that integration would be the use of [`react-flaxs`](https://github.com/jcperez-ch/react-flaxs)
+You can connect to the master store only if you use `@connect` or connecting to `@multiConnect` if you want to connect to many stores.
 
-    if (newState !== this.state)) {
-      this.setState(newState);
-    }
-  }
-  render() {
-    return null; // Here goes whatever you like
-  }
-}
+```sh
+npm i --save react-flaxs@latest
 ```
 
 You can create as many connectors as you wish, in order to make your components reactive.
-
-Eventually the *connectors* will be implemented and extended in `react-flaxs` to integrate it with ReactJS.
 
 ## Actions
 

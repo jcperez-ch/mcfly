@@ -8,7 +8,6 @@ function reThrow(reject, error) {
   return reject(error);
 }
 
-
 /**
  * Action class
  */
@@ -51,17 +50,21 @@ class Action {
       }));
   }
 
-  syncDispatch() {
-    const payload = this.callback.apply(this, arguments);
+  syncDispatch(...args) {
+    const payload = this.callback.apply(this, args);
     const reject = () => true;
-    if (!payload) return reThrow(reject, 'Payload needs to be an object');
-    if (!payload.actionType) return reThrow(reject, 'Payload object requires an actionType property');
+    if (!payload) return reThrow(reject, message('payloadObject'));
+    if (!payload.actionType) {
+      return reThrow(reject, message('payloadRequiresActionType'));
+    }
 
     try {
       Dispatcher.dispatch(payload);
     } catch (error) {
       reThrow(reject, error);
     }
+
+    return true;
   }
 }
 
