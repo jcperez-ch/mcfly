@@ -25,7 +25,7 @@
   ],
   "author": "Dan Abramov <dan.abramov@me.com> (http://github.com/gaearon)",
   "contributors": [
-    "JC Perez Chavez <jc.perezchavez@gmail.com>",
+    "JC Perez Chavez <jc.perezchavez@gmail.com>"
   ],
   "license": "MIT",
   "bugs": {
@@ -63,6 +63,6 @@
     "lodash": "^4.13.1",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
-    "react-flaxs": "^0.1.0"
+    "react-flaxs": "^0.1.1"
   }
 }
