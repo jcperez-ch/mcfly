@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var packageJson = require('./package.json');
 
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'source-map',
   entry: [
     `webpack-dev-server/client?http://localhost:${packageJson[packageJson.name].port}`,
     'webpack/hot/only-dev-server',

@@ -63,6 +63,7 @@
     "lodash": "^4.13.1",
     "react": "^0.14.6",
     "react-dom": "^0.14.6",
-    "react-flaxs": "^0.1.1"
+    "react-flaxs": "^0.1.1",
+    "react-syntax-highlighter": "^2.1.0"
   }
 }
