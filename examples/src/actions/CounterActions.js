@@ -8,7 +8,7 @@ export default flaxs.createActions({
     }),
     decrementCounterWithStore: (state) => ({
       actionType: Actions.DECREMENT_COUNTER_WITH_STORE,
-      state: state,
+      state,
     }),
     incrementCounterWithReducer: () => ({
       actionType: Actions.INCREMENT_COUNTER_WITH_REDUCER,
