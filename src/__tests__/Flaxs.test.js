@@ -1,19 +1,8 @@
-// __tests__/Store-test.js
-/* eslint-disable global-require */
-
-jest.dontMock('../Flaxs');
-jest.dontMock('../Store');
-jest.dontMock('../ActionsFactory');
-jest.dontMock('../Action');
-jest.dontMock('../Dispatcher');
-jest.dontMock('../Messager');
-
+import { flaxs } from '../Flaxs';
+import Store from '../Store';
+import ActionsFactory from '../ActionsFactory';
 
 describe('Flaxs', () => {
-
-  const { flaxs } = require('../Flaxs');
-  const Store = require('../Store').default;
-  const ActionsFactory = require('../ActionsFactory').default;
   const TestConstants = {
     TEST_ADD: 'TEST_ADD',
     TEST_REMOVE: 'TEST_REMOVE',
@@ -40,26 +29,26 @@ describe('Flaxs', () => {
   });
 
   const mockActionsFactory = flaxs.createActions({
-    add: (item) => ({
+    add: item => ({
       actionType: TestConstants.TEST_ADD,
       item,
     }),
-    remove: (item) => ({
+    remove: item => ({
       actionType: TestConstants.TEST_REMOVE,
       item,
     }),
-    consume: (value) => ({
+    consume: value => ({
       actionType: TestConstants.TEST_CONSUME,
       value,
     }),
   });
 
   const mockSyncActionsFactory = flaxs.createActions({
-    add: (item) => ({
+    add: item => ({
       actionType: TestConstants.TEST_ADD,
       item,
     }),
-    remove: (item) => ({
+    remove: item => ({
       actionType: TestConstants.TEST_REMOVE,
       item,
     }),
@@ -107,7 +96,7 @@ describe('Flaxs', () => {
     expect('add' in flaxs.actions).toEqual(true);
   });
 
-  pit('should digest the correct payload in the store when it is dispatched', async () => {
+  it('should digest the correct payload in the store when it is dispatched', async () => {
     const testItem = 'test';
 
     await mockActionsFactory.add(testItem);
@@ -133,7 +122,7 @@ describe('Flaxs', () => {
     expect(flaxs.store.getDispatchTokens(['reducer']).length).toBe(1);
   });
 
-  pit('should digest the correct payload in the reducer when it is dispatched', async () => {
+  it('should digest the correct payload in the reducer when it is dispatched', async () => {
     const testItem = 5;
 
     await mockActionsFactory.add(testItem);
@@ -143,7 +132,7 @@ describe('Flaxs', () => {
     expect(flaxs.store.state.reducer.removes).toEqual(6);
   });
 
-  pit(`should emit a single change in master store if multiple reducers changed
+  it(`should emit a single change in master store if multiple reducers changed
     the state`, async () => {
     flaxs.store.emitChange = jest.fn();
     flaxs.createReducer('consumer', (state, { actionType, value }) => {
@@ -191,7 +180,6 @@ describe('Flaxs', () => {
   });
 
   it('should synchronously dispatch actions', () => {
-
     const testItem = 2;
 
     expect(flaxs.store.state.reducer.adds).toEqual(6);

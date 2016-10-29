@@ -1,17 +1,9 @@
-// __tests__/Store-test.js
+import { includes, union, isEqual } from 'lodash';
+import Store from '../Store';
+import { flaxs } from '../Flaxs';
 /* eslint-disable global-require */
 
-jest.dontMock('../Store');
-jest.dontMock('../Flaxs');
-jest.dontMock('../Dispatcher');
-jest.dontMock('../Messager');
-
 describe('Store', () => {
-
-  const { default: Store } = require('../Store');
-  const { flaxs } = require('../Flaxs');
-  const { includes, union, isEqual } = require('lodash');
-
   const mockStore = new Store({
     testMethod: () => true,
   }, ({ actionType }) => {

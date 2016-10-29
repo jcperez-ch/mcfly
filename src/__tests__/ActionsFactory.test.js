@@ -1,11 +1,7 @@
 // __tests__/ActionsFactory-test.js
 /* eslint-disable global-require */
 
-jest.dontMock('../ActionsFactory');
-jest.dontMock('../Action');
-
 describe('ActionsFactory', () => {
-
   const ActionsFactory = require('../ActionsFactory').default;
   let mockActionsFactory;
 
@@ -26,7 +22,6 @@ describe('ActionsFactory', () => {
   });
 
   it('create new synchronous Actions', () => {
-
     mockActionsFactory = new ActionsFactory({
       testMethodA: () => ({
         actionType: 'TEST_ACTION_A',
@@ -40,7 +35,5 @@ describe('ActionsFactory', () => {
 
     expect(mockActionsFactory.testMethodA).toBeDefined();
     expect(mockActionsFactory.testMethodB).toBeDefined();
-
   });
-
 });

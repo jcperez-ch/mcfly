@@ -1,11 +1,7 @@
 // __tests__/Action-test.js
 /* eslint-disable global-require */
 
-jest.dontMock('../Action');
-jest.dontMock('../Messager');
-
 describe('Action', () => {
-
   const Action = require('../Action').default;
   const Dispatcher = require('../Dispatcher').default;
   let mockAction;
@@ -18,7 +14,7 @@ describe('Action', () => {
   });
 
   pit('should reject if actionType isn\'t supplied', async () => {
-    callback = (argument) => ({ test: argument });
+    callback = argument => ({ test: argument });
 
     mockAction = new Action(callback);
     let success = true;
@@ -35,7 +31,7 @@ describe('Action', () => {
   });
 
   it('should not throw if actionType IS supplied', () => {
-    callback = (argument) => ({
+    callback = argument => ({
       actionType: 'TEST_ACTION',
       test: argument,
     });
@@ -65,7 +61,7 @@ describe('Action', () => {
   });
 
   pit('should resolve if actionType IS supplied', async () => {
-    callback = (argument) => ({
+    callback = argument => ({
       actionType: 'TEST_ACTION',
       test: argument,
     });
@@ -86,5 +82,4 @@ describe('Action', () => {
   it('should have dispatched the supplied payload', () => {
     expect(Dispatcher.dispatch.mock.calls.length).toEqual(2);
   });
-
 });
