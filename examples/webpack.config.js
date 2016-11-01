@@ -10,6 +10,9 @@ module.exports = {
     'webpack/hot/only-dev-server',
     './src/index',
   ],
+  externals: {
+    'flaxs': 'flaxs',
+  },
   resolve: {
     extensions: ['', '.js', '.jsx', '.json'],
   },
