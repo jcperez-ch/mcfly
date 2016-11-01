@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import iv from 'invariant';
-import { assign, compact, get, includes, isArray, isString, map } from 'lodash';
+import get from 'lodash.get';
 import message from './Messager';
 
 /**
@@ -20,13 +20,13 @@ const recursivelyMergeState = (initialState, namespace, state) => {
       [parentNS]: recursivelyMergeState(get(initialState, parentNS), childNS, state),
     };
 
-    return Object.freeze(assign({},
+    return Object.freeze(Object.assign({},
       initialState,
       extend,
     ));
   }
 
-  return Object.freeze(assign({}, initialState, { [namespace]: state }));
+  return Object.freeze(Object.assign({}, initialState, { [namespace]: state }));
 };
 
 /**
@@ -51,7 +51,7 @@ class Store {
     iv(!methods.dispatcherIds, message('reservedDispatcherIds'));
     iv(!methods.state, message('reservedState'));
     iv(!methods.frozenState, message('reservedFrozenState'));
-    assign(this, EventEmitter.prototype, methods);
+    Object.assign(this, EventEmitter.prototype, methods);
     this.mixin = {
       componentDidMount: function componentDidMount() {
         let warn;
@@ -116,7 +116,7 @@ class Store {
   }
 
   addMethods(methods) {
-    assign(this, methods);
+    Object.assign(this, methods);
   }
 
   mergeState(namespace, state) {
@@ -147,18 +147,21 @@ class MasterStore extends Store {
    * Returns dispatch token
    */
   getDispatchTokens(namespace = '') {
-    if (isString(namespace)) {
-      return namespace === '' || !this.dispatcherIds.hasOwnProperty(namespace) ?
-        map(this.dispatcherIds, dId => dId) :
+    if (typeof namespace === 'string') {
+      return namespace === '' || !{}.hasOwnProperty.call(this.dispatcherIds, namespace) ?
+        Object.keys(this.dispatcherIds).map(ns => this.dispatcherIds[ns]) :
         [this.dispatcherIds[namespace]];
     }
-    if (!isArray(namespace)) {
+    if (!Array.isArray(namespace)) {
       iv(false, message('noDispatcherTokens', typeof namespace));
     }
 
-    return compact(map(this.dispatcherIds, (dispacherID, ns) => (
-      includes(namespace, ns) ? dispacherID : null))
-    );
+    return Object.keys(this.dispatcherIds).reduce((tokens, ns) => {
+      if (namespace.includes(ns)) {
+        tokens.push(this.dispatcherIds[ns]);
+      }
+      return tokens;
+    }, []);
   }
 
   freezeState() {
@@ -167,9 +170,9 @@ class MasterStore extends Store {
 
   emitChangeIfStoreChanged() {
     if (this.frozenState !== this.state) {
-      this.frozenState = null;
       this.emitChange();
     }
+    this.frozenState = null;
     return this.state;
   }
 
@@ -181,7 +184,7 @@ class MasterStore extends Store {
    * @param {[type]} dispatcherID [description]
    */
   addDispatcherId(namespace, dispatcherID) {
-    if (namespace !== null && this.dispatcherIds.hasOwnProperty(namespace)) {
+    if (namespace !== null && {}.hasOwnProperty.call(this.dispatcherIds, namespace)) {
       iv(false, message('existingNamespace', namespace));
     }
     this.dispatcherIds[namespace] = dispatcherID;

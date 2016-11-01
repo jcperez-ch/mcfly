@@ -32,7 +32,7 @@ class Action {
    * @returns Promise object
    */
   dispatch(...args) {
-    return Promise.resolve(this.callback.apply(this, args)).then((payload) =>
+    return Promise.resolve(this.callback(...args)).then(payload =>
       new Promise((resolve, reject) => {
         if (!payload) return reThrow(reject, message('payloadObject'));
         if (!payload.actionType) {
@@ -51,7 +51,7 @@ class Action {
   }
 
   syncDispatch(...args) {
-    const payload = this.callback.apply(this, args);
+    const payload = this.callback(...args);
     const reject = () => true;
     if (!payload) return reThrow(reject, message('payloadObject'));
     if (!payload.actionType) {

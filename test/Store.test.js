@@ -1,17 +1,9 @@
-// __tests__/Store-test.js
-/* eslint-disable global-require */
-
-jest.dontMock('../Store');
-jest.dontMock('../Flaxs');
-jest.dontMock('../Dispatcher');
-jest.dontMock('../Messager');
+/* eslint-disable no-unused-expressions */
+import { expect } from 'chai';
+import Store from '../src/Store';
+import { flaxs } from '../src/Flaxs';
 
 describe('Store', () => {
-
-  const { default: Store } = require('../Store');
-  const { flaxs } = require('../Flaxs');
-  const { includes, union, isEqual } = require('lodash');
-
   const mockStore = new Store({
     testMethod: () => true,
   }, ({ actionType }) => {
@@ -30,7 +22,7 @@ describe('Store', () => {
         newState = { ...this.state, loaded: true };
         break;
       case 'ADD':
-        if (!includes(this.state.todos, params.item)) {
+        if (!this.state.todos.includes(params.item)) {
           newState = {
             ...this.state,
             todos: [
@@ -40,21 +32,11 @@ describe('Store', () => {
           };
         }
         break;
-      case 'ADD_ALL': {
-        const todos = union(this.state.todos, params.items);
-        if (!isEqual(this.state.todos, todos)) {
-          newState = {
-            ...this.state,
-            todos,
-          };
-        }
-        break;
-      }
       default:
         return true;
     }
     const currentState = this.emitChangeIfStoreChanged(newState);
-    expect(currentState.loaded).toBe(true);
+    expect(currentState.loaded).to.be.true;
     return true;
   }
 
@@ -66,26 +48,26 @@ describe('Store', () => {
   });
 
   it('should return a new instance with methods attached via the methods argument', () => {
-    expect(mockStore.testMethod).toBeDefined();
+    expect(mockStore.testMethod).to.be.defined;
   });
 
   it('should attach the supplied callback to the new instance', () => {
-    expect(mockStore.callback).toBeDefined();
+    expect(mockStore.callback).to.be.defined;
   });
 
   it('should be merged with EventEmitter', () => {
-    expect('on' in mockStore).toEqual(true);
-    expect('removeListener' in mockStore).toEqual(true);
-    expect('emit' in mockStore).toEqual(true);
+    expect('on' in mockStore).to.be.true;
+    expect('removeListener' in mockStore).to.be.true;
+    expect('emit' in mockStore).to.be.true;
   });
 
   it('should create a mixin property', () => {
-    expect(mockStore.mixin).toBeDefined();
+    expect(mockStore.mixin).to.be.defined;
   });
 
   it('should return a dispatcherID when getDispatchToken is called', () => {
     mockStore.dispatcherID = 5;
-    expect(mockStore.getDispatchToken()).toEqual(5);
+    expect(mockStore.getDispatchToken()).to.equal(5);
   });
 
   it('should throw if a supplied method is named "callback"', () => {
@@ -93,7 +75,7 @@ describe('Store', () => {
       Store.constructor({
         callback: () => true,
       }, () => {});
-    }).toThrow();
+    }).to.throw(/.*/);
   });
 
   it('should throw if a supplied method is named "mixin"', () => {
@@ -101,23 +83,23 @@ describe('Store', () => {
       Store.constructor({
         mixin: () => true,
       }, () => {});
-    }).toThrow();
+    }).to.throw(/.*/);
   });
 
   it('should store values on the state', () => {
-    expect(mockStoreWithState.state).toBeDefined();
+    expect(mockStoreWithState.state).to.not.be.undefined;
     const beforeReadyState = mockStoreWithState.state;
     flaxs.dispatcher.dispatch({
       actionType: 'READY',
     });
-    expect(mockStoreWithState.state).not.toBe(beforeReadyState);
+    expect(mockStoreWithState.state).to.not.equal(beforeReadyState);
 
     flaxs.dispatcher.dispatch({
       actionType: 'ADD',
       item: 'First Item',
     });
 
-    expect(mockStoreWithState.state.todos.length).toBe(1);
+    expect(mockStoreWithState.state.todos.length).to.equal(1);
   });
 
   describe('MasterStore', () => {
@@ -126,14 +108,14 @@ describe('Store', () => {
     });
 
     it('should have an already defined store', () => {
-      expect(flaxs.store.state).toBeDefined();
-      expect(flaxs.store.state.startingWith).toBe('test');
+      expect(flaxs.store.state).to.not.be.undefined;
+      expect(flaxs.store.state.startingWith).to.equal('test');
     });
 
     it('should merge states', () => {
       flaxs.store.mergeState('user', { info: null });
 
-      expect(flaxs.store.state.user).toEqual({ info: null });
+      expect(flaxs.store.state.user).to.eql({ info: null });
     });
 
     it('should contain frozen referenced objects', () => {
@@ -142,10 +124,10 @@ describe('Store', () => {
         userType: 'GUEST',
       } });
 
-      expect(Object.isFrozen(flaxs.store.state)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.startingWith)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.user.info)).toBe(false);
+      expect(Object.isFrozen(flaxs.store.state)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.startingWith)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.user)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.user.info)).to.be.false;
     });
 
     it('should create a tree object if the namespace contains dots', () => {
@@ -160,7 +142,7 @@ describe('Store', () => {
         notifications: { push: true, browser: false },
       });
 
-      expect(flaxs.store.state.user).toEqual({
+      expect(flaxs.store.state.user).to.eql({
         status: 'ACTIVE',
         userType: 'GUEST',
         preferences: {
@@ -170,10 +152,25 @@ describe('Store', () => {
         },
       });
 
-      expect(Object.isFrozen(flaxs.store.state)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.user)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.user.preferences)).toBe(true);
-      expect(Object.isFrozen(flaxs.store.state.user.preferences.notifications)).toBe(false);
+      expect(Object.isFrozen(flaxs.store.state)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.user)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.user.preferences)).to.be.true;
+      expect(Object.isFrozen(flaxs.store.state.user.preferences.notifications)).to.be.false;
+    });
+
+    it('shold get the dispatcherIds according to its namespace', () => {
+      const countReducers = flaxs.store.getDispatchTokens().length;
+
+      flaxs.createReducer('one', state => state, { pointOne: 1.1, pointTwo: 1.2 });
+      flaxs.createReducer('two', state => state, { pointTwo: 2.2, pointThree: 2.3 });
+      flaxs.createReducer('three', state => state, { pointOne: 3.1, pointThree: 3.3 });
+
+      expect(flaxs.store.getDispatchTokens().length).to.equal(countReducers + 3);
+      expect(flaxs.store.getDispatchTokens('two')).to.eql([flaxs.store.dispatcherIds.two]);
+      expect(flaxs.store.getDispatchTokens(['one', 'three'])).to.eql([
+        flaxs.store.dispatcherIds.one,
+        flaxs.store.dispatcherIds.three,
+      ]);
     });
   });
 });

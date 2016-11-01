@@ -1,7 +1,8 @@
+import get from 'lodash.get';
+
 import Dispatcher from './Dispatcher';
 import Store, { MasterStore } from './Store';
 import ActionsFactory from './ActionsFactory';
-import { assign, difference, every, get, reduce } from 'lodash';
 
 /**
  * Main McFly Class
@@ -47,7 +48,7 @@ class Flaxs {
    */
   createActions(actions, isAsync = true) {
     const actionFactory = new ActionsFactory(actions, isAsync);
-    assign(this.actions, actionFactory);
+    Object.assign(this.actions, actionFactory);
     return actionFactory;
   }
 
@@ -63,11 +64,13 @@ class Flaxs {
     this.store.mergeState(namespace, initialState);
     const dispatcherID = this.dispatcher.register((payload) => {
       const dispatcherHandled = get(this.dispatcher, '_isHandled');
-      const pendingReducers = reduce(
-        dispatcherHandled, (accPending, isHandled, pendingDispatcherID) => {
+
+      const pendingReducers = Object.keys(dispatcherHandled).reduce(
+        (accPending, pendingDispatcherID) => {
+          const isHandled = dispatcherHandled[pendingDispatcherID];
           const isPending = !isHandled && dispatcherID !== pendingDispatcherID;
-          const isFromStore = every(
-            this.stores, (store) => store.dispatcherID !== pendingDispatcherID
+          const isFromStore = this.stores.every(
+            store => store.dispatcherID !== pendingDispatcherID
           );
           if (isPending && isFromStore) {
             accPending.push(pendingDispatcherID);
@@ -75,7 +78,13 @@ class Flaxs {
           return accPending;
         }, []
       );
-      const restOfReducers = difference(this.store.getDispatchTokens(), [dispatcherID]);
+
+      const restOfReducers = this.store.getDispatchTokens().reduce((diff, token) => {
+        if (token !== dispatcherID) {
+          diff.push(token);
+        }
+        return diff;
+      }, []);
       if (restOfReducers.length === pendingReducers.length) {
         this.store.freezeState();
       }

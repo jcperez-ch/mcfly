@@ -1,24 +1,26 @@
-// __tests__/Action-test.js
-/* eslint-disable global-require */
+/* eslint-disable no-unused-expressions */
+import chai, { expect } from 'chai';
+import spies from 'chai-spies';
 
-jest.dontMock('../Action');
-jest.dontMock('../Messager');
+import Action from '../src/Action';
+import Dispatcher from '../src/Dispatcher';
+
+chai.use(spies);
 
 describe('Action', () => {
-
-  const Action = require('../Action').default;
-  const Dispatcher = require('../Dispatcher').default;
   let mockAction;
   let callback;
+
+  Dispatcher.dispatch = chai.spy(Dispatcher.dispatch);
 
   it('should attach the callback argument to the instance', () => {
     callback = () => false;
     mockAction = new Action(callback);
-    expect(mockAction.callback).toBe(callback);
+    expect(mockAction.callback).to.equal(callback);
   });
 
-  pit('should reject if actionType isn\'t supplied', async () => {
-    callback = (argument) => ({ test: argument });
+  it('should reject if actionType isn\'t supplied', async () => {
+    callback = argument => ({ test: argument });
 
     mockAction = new Action(callback);
     let success = true;
@@ -30,12 +32,12 @@ describe('Action', () => {
       error = e;
     }
 
-    expect(success).toBe(true);
-    expect(error).toEqual('Payload object requires an actionType property');
+    expect(success).to.be.true;
+    expect(error).to.equal('Payload object requires an actionType property');
   });
 
   it('should not throw if actionType IS supplied', () => {
-    callback = (argument) => ({
+    callback = argument => ({
       actionType: 'TEST_ACTION',
       test: argument,
     });
@@ -44,11 +46,10 @@ describe('Action', () => {
 
     expect(() => {
       mockAction.dispatch('test');
-      jest.runAllTimers();
-    }).not.toThrow();
+    }).to.not.throw(/.*/);
   });
 
-  pit('should reject if returns falsy value', async () => {
+  it('should reject if returns falsy value', async () => {
     callback = () => false;
     mockAction = new Action(callback);
     let success = true;
@@ -60,12 +61,12 @@ describe('Action', () => {
       error = caughtError;
     }
 
-    expect(success).toBe(true);
-    expect(error).toEqual('Payload needs to be an object');
+    expect(success).to.be.true;
+    expect(error).to.equal('Payload needs to be an object');
   });
 
-  pit('should resolve if actionType IS supplied', async () => {
-    callback = (argument) => ({
+  it('should resolve if actionType IS supplied', async () => {
+    callback = argument => ({
       actionType: 'TEST_ACTION',
       test: argument,
     });
@@ -79,12 +80,11 @@ describe('Action', () => {
       error = caughtError;
     }
 
-    expect(success).toBeUndefined();
-    expect(error).toBeUndefined();
+    expect(success).to.be.undefined;
+    expect(error).to.be.undefined;
   });
 
   it('should have dispatched the supplied payload', () => {
-    expect(Dispatcher.dispatch.mock.calls.length).toEqual(2);
+    expect(Dispatcher.dispatch).to.have.been.called.twice;
   });
-
 });

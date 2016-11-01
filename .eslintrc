@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb",
+  "extends": "airbnb-base",
   "parser": "babel-eslint",
   "env": {
     "node": true,
@@ -7,6 +7,6 @@
     "jest": true
   },
   "rules": {
-    "padded-blocks": [0],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*.test.js", "**/*.spec.js"]}]
   }
 }
