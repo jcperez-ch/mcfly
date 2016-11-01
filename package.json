@@ -1,6 +1,6 @@
 {
   "name": "flaxs",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "const Flaxs = Flux + Redux.principles()",
   "keywords": [
     "flux",
