@@ -1,8 +1,8 @@
-// __tests__/ActionsFactory-test.js
-/* eslint-disable global-require */
+/* eslint-disable no-unused-expressions */
+import { expect } from 'chai';
+import ActionsFactory from '../src/ActionsFactory';
 
 describe('ActionsFactory', () => {
-  const ActionsFactory = require('../ActionsFactory').default;
   let mockActionsFactory;
 
   it('create new Actions and return an object with the supplied method names as callers', () => {
@@ -17,8 +17,8 @@ describe('ActionsFactory', () => {
       }),
     });
 
-    expect(mockActionsFactory.testMethodA).toBeDefined();
-    expect(mockActionsFactory.testMethodB).toBeDefined();
+    expect(mockActionsFactory.testMethodA).to.not.be.undefined;
+    expect(mockActionsFactory.testMethodB).to.not.be.undefined;
   });
 
   it('create new synchronous Actions', () => {
@@ -33,7 +33,7 @@ describe('ActionsFactory', () => {
       }),
     }, false);
 
-    expect(mockActionsFactory.testMethodA).toBeDefined();
-    expect(mockActionsFactory.testMethodB).toBeDefined();
+    expect(mockActionsFactory.testMethodA).to.not.be.undefined;
+    expect(mockActionsFactory.testMethodB).to.not.be.undefined;
   });
 });
